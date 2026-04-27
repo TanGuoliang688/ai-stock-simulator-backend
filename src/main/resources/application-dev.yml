@@ -1,0 +1,56 @@
+# ============================================
+# 开发环境配置
+# ============================================
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ai_stock_simulator?useUnicode=true&characterEncoding=utf8mb4&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: TANguoliang666
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariCP-AIStockSimulator
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+      database: 0   # dev用0，local用1，避免冲突
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 3
+        max-concurrency: 10
+
+# Flyway 数据库迁移
+spring.flyway:
+  enabled: true
+  locations: classpath:db/migration
+  baseline-on-migrate: true
+  validate-on-migrate: true
+
+# 开发环境特定配置
+dev:
+  mock:
+    stock-data: false  # 是否使用模拟股票数据
+    ai-response: false  # 是否使用模拟AI响应

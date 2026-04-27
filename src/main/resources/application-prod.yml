@@ -1,0 +1,80 @@
+# ============================================
+# 生产环境配置
+# ============================================
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:mysql-prod}:${DB_PORT:3306}/${DB_NAME:ai_stock_simulator}?useUnicode=true&characterEncoding=utf8mb4&useSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariCP-AIStockSimulator-Prod
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis-prod}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 20
+          min-idle: 5
+          max-wait: -1ms
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq-prod}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 20
+
+# Flyway 生产环境谨慎使用
+spring.flyway:
+  enabled: true
+  locations: classpath:db/migration
+  baseline-on-migrate: false
+  validate-on-migrate: true
+
+# 生产环境日志配置
+logging:
+  level:
+    root: WARN
+    com.tangl.aistocksimulatorbackend: INFO
+  file:
+    name: /var/log/ai-stock-simulator/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
+
+# 生产环境关闭 Swagger
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# JVM 监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
