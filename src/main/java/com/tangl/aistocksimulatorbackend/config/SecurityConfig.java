@@ -30,6 +30,9 @@ public class SecurityConfig {
                         // 认证接口 - 公开访问
                         .requestMatchers("/auth/**").permitAll()
 
+                        // 股票行情接口 - 公开访问（搜索、列表、详情不需要登录）
+                        .requestMatchers("/stock/**").permitAll()
+
                         // 健康检查接口 - 公开访问
                         .requestMatchers("/health/**").permitAll()
 
