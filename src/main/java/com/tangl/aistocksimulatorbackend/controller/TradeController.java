@@ -1,4 +1,3 @@
-
 package com.tangl.aistocksimulatorbackend.controller;
 
 import com.tangl.aistocksimulatorbackend.common.Result;
@@ -6,8 +5,8 @@ import com.tangl.aistocksimulatorbackend.entity.Position;
 import com.tangl.aistocksimulatorbackend.entity.TradeOrder;
 import com.tangl.aistocksimulatorbackend.entity.TradeRecord;
 import com.tangl.aistocksimulatorbackend.service.TradeService;
+import com.tangl.aistocksimulatorbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -27,9 +26,8 @@ public class TradeController {
     public Result<TradeOrder> buy(
             @RequestParam String symbol,
             @RequestParam BigDecimal price,
-            @RequestParam Integer quantity,
-            Authentication authentication) {
-        Long userId = getCurrentUserId(authentication);
+            @RequestParam Integer quantity) {
+        Long userId = SecurityUtils.getCurrentUserId();
         TradeOrder order = tradeService.buyStock(userId, symbol, price, quantity);
         return Result.success("买入成功", order);
     }
@@ -41,9 +39,8 @@ public class TradeController {
     public Result<TradeOrder> sell(
             @RequestParam String symbol,
             @RequestParam BigDecimal price,
-            @RequestParam Integer quantity,
-            Authentication authentication) {
-        Long userId = getCurrentUserId(authentication);
+            @RequestParam Integer quantity) {
+        Long userId = SecurityUtils.getCurrentUserId();
         TradeOrder order = tradeService.sellStock(userId, symbol, price, quantity);
         return Result.success("卖出成功", order);
     }
@@ -52,8 +49,8 @@ public class TradeController {
      * 获取持仓列表
      */
     @GetMapping("/positions")
-    public Result<List<Position>> getPositions(Authentication authentication) {
-        Long userId = getCurrentUserId(authentication);
+    public Result<List<Position>> getPositions() {
+        Long userId = SecurityUtils.getCurrentUserId();
         List<Position> positions = tradeService.getUserPositions(userId);
         return Result.success(positions);
     }
@@ -63,15 +60,9 @@ public class TradeController {
      */
     @GetMapping("/records")
     public Result<List<TradeRecord>> getRecords(
-            @RequestParam(defaultValue = "50") int limit,
-            Authentication authentication) {
-        Long userId = getCurrentUserId(authentication);
+            @RequestParam(defaultValue = "50") int limit) {
+        Long userId = SecurityUtils.getCurrentUserId();
         List<TradeRecord> records = tradeService.getUserTradeRecords(userId, limit);
         return Result.success(records);
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        // TODO: 从 JWT Token 中解析用户ID
-        return 1L;
     }
 }

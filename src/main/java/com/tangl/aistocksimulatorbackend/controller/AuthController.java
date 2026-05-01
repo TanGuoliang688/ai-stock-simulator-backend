@@ -7,6 +7,7 @@ import com.tangl.aistocksimulatorbackend.dto.request.RegisterRequest;
 import com.tangl.aistocksimulatorbackend.dto.response.LoginResponse;
 import com.tangl.aistocksimulatorbackend.dto.response.UserResponse;
 import com.tangl.aistocksimulatorbackend.service.AuthService;
+import com.tangl.aistocksimulatorbackend.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public Result<UserResponse> getCurrentUser() {
-        UserResponse response = authService.getCurrentUser();
+        Long userId = SecurityUtils.getCurrentUserId();
+        UserResponse response = authService.getCurrentUserById(userId);
         return Result.success(response);
     }
 }

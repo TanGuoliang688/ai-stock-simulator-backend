@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +33,52 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return generateToken(userDetails.getUsername(), accessTokenExpiration);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
+
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("userId", userDetails.getUserId())  // 从 CustomUserDetails 获取 userId
+                .issuedAt(new Date())
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    /**
+     * 从 Token 中获取用户ID
+     */
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("userId", Long.class);
+    }
+
+    /**
+     * 从 UserDetails 中获取用户ID
+     */
+    private Long getUserIdFromUserDetails(UserDetails userDetails) {
+        // CustomUserDetailsService 中会将 userId 存储在 username 或其他字段
+        // 这里需要根据实际情况调整
+        return getCurrentUserIdFromContext();
+    }
+
+    /**
+     * 从 SecurityContext 中获取当前用户ID
+     */
+    private Long getCurrentUserIdFromContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            // 这里需要从自定义的 UserDetails 中获取 userId
+            // 暂时返回 null，需要在 CustomUserDetailsService 中完善
+            return null;
+        }
+        return null;
     }
 
     public String generateRefreshToken(String username) {
@@ -74,4 +119,6 @@ public class JwtTokenProvider {
     public long getAccessTokenExpiration() {
         return accessTokenExpiration;
     }
+
+
 }

@@ -95,8 +95,20 @@ public class AuthService {
     }
 
     public UserResponse getCurrentUser() {
+        // 从 SecurityContext 获取用户名
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userMapper.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        return convertToResponse(user);
+    }
+
+    public UserResponse getCurrentUserById(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
         return convertToResponse(user);
     }
 
