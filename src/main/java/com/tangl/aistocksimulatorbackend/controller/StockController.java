@@ -3,13 +3,17 @@ package com.tangl.aistocksimulatorbackend.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tangl.aistocksimulatorbackend.common.Result;
+import com.tangl.aistocksimulatorbackend.service.StockPriceService;
 import com.tangl.aistocksimulatorbackend.service.StockService;
 import com.tangl.aistocksimulatorbackend.vo.KLineDataVO;
 import com.tangl.aistocksimulatorbackend.vo.StockVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/stock")
@@ -17,6 +21,7 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
+    private final StockPriceService stockPriceService;
 
     /**
      * 搜索股票
@@ -55,5 +60,26 @@ public class StockController {
             @RequestParam(defaultValue = "30") int days) {
         // TODO: 实现K线数据查询
         return Result.success(null);
+    }
+
+    /**
+     * 获取实时价格
+     */
+    @GetMapping("/price/{symbol}")
+    public Result<Map<String, Object>> getRealTimePrice(@PathVariable String symbol) {
+        BigDecimal price = stockPriceService.getCurrentPrice(symbol);
+        Map<String, Object> data = new HashMap<>();
+        data.put("symbol", symbol);
+        data.put("price", price);
+        return Result.success(data);
+    }
+
+    /**
+     * 获取所有股票实时价格
+     */
+    @GetMapping("/prices")
+    public Result<Map<String, Object>> getAllRealTimePrices() {
+        Map<String, Object> prices = stockPriceService.getAllPrices();
+        return Result.success(prices);
     }
 }
