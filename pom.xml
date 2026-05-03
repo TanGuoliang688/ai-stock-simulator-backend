@@ -115,6 +115,18 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- HTTP Client for AI API calls -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Resilience4j (熔断降级) -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>

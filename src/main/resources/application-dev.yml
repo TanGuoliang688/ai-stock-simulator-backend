@@ -60,3 +60,10 @@ dev:
   mock:
     stock-data: false  # 是否使用模拟股票数据
     ai-response: false  # 是否使用模拟AI响应
+
+# AI Configuration
+ai:
+  qwen:
+    api-key: sk-b2ca1df26fe443bd90621e569929b137
+    api-url: https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+    model: qwen-turbo
